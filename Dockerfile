@@ -1,10 +1,10 @@
-FROM python:3.8-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
 COPY pyproject.toml poetry.lock /app/
 RUN pip install poetry && poetry install
 
-COPY ./src /app/src
+COPY ./api /app/api
 
-CMD ["poetry", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

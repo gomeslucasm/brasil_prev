@@ -6,16 +6,41 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
-      - /app/.venv
+      - ./api:/app/api
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: mydatabase
+      DB_HOST: db
+      DB_PORT: 5432
     command:
       [
         "poetry",
         "run",
         "uvicorn",
-        "src.main:app",
+        "api.main:app",
         "--host",
         "0.0.0.0",
         "--port",
-        "8000"
+        "8000",
+        "--reload"
       ]
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+
