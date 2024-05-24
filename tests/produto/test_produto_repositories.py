@@ -12,27 +12,35 @@ def test_create_produto(db, delete_entity_on_db):
     produto_data = {
         "nome": "Brasilprev Produto",
         "susep": "15414900840201817",
-        "expiracaoDeVenda": expiracao_de_venda,
-        "valorMinimoAporteInicial": 1000.0,
-        "valorMinimoAporteExtra": 100.0,
-        "idadeDeEntrada": 18,
-        "idadeDeSaida": 60,
-        "carenciaInicialDeResgate": 60,
-        "carenciaEntreResgates": 30,
+        "expiracao_de_venda": expiracao_de_venda,
+        "valor_minimo_aporte_inicial": 1000.0,
+        "valor_minimo_aporte_extra": 100.0,
+        "idade_de_entrada": 18,
+        "idade_de_saida": 60,
+        "carencia_inicial_de_resgate": 60,
+        "carencia_entre_resgates": 30,
     }
     produto = repository.create(**produto_data)
     assert produto.nome == produto_data["nome"]
     assert produto.susep == produto_data["susep"]
     assert (
-        produto.expiracaoDeVenda.isoformat()
-        == produto_data["expiracaoDeVenda"].isoformat()
+        produto.expiracao_de_venda.isoformat()
+        == produto_data["expiracao_de_venda"].isoformat()
     )
-    assert produto.valorMinimoAporteInicial == produto_data["valorMinimoAporteInicial"]
-    assert produto.valorMinimoAporteExtra == produto_data["valorMinimoAporteExtra"]
-    assert produto.idadeDeEntrada == produto_data["idadeDeEntrada"]
-    assert produto.idadeDeSaida == produto_data["idadeDeSaida"]
-    assert produto.carenciaInicialDeResgate == produto_data["carenciaInicialDeResgate"]
-    assert produto.carenciaEntreResgates == produto_data["carenciaEntreResgates"]
+    assert (
+        produto.valor_minimo_aporte_inicial
+        == produto_data["valor_minimo_aporte_inicial"]
+    )
+    assert (
+        produto.valor_minimo_aporte_extra == produto_data["valor_minimo_aporte_extra"]
+    )
+    assert produto.idade_de_entrada == produto_data["idade_de_entrada"]
+    assert produto.idade_de_saida == produto_data["idade_de_saida"]
+    assert (
+        produto.carencia_inicial_de_resgate
+        == produto_data["carencia_inicial_de_resgate"]
+    )
+    assert produto.carencia_entre_resgates == produto_data["carencia_entre_resgates"]
 
     delete_entity_on_db(produto)
 

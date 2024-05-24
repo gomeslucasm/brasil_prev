@@ -29,12 +29,12 @@ def test_create_produto_service(
     mock_produto_repository.create.assert_called_once_with(
         nome=produto_data.nome,
         susep=produto_data.susep,
-        expiracaoDeVenda=produto_data.expiracaoDeVenda,
-        valorMinimoAporteInicial=produto_data.valorMinimoAporteInicial,
-        valorMinimoAporteExtra=produto_data.valorMinimoAporteExtra,
-        idadeDeEntrada=produto_data.idadeDeEntrada,
-        idadeDeSaida=produto_data.idadeDeSaida,
-        carenciaInicialDeResgate=produto_data.carenciaInicialDeResgate,
-        carenciaEntreResgates=produto_data.carenciaEntreResgates,
+        expiracao_de_venda=produto_data.expiracao_de_venda,
+        valor_minimo_aporte_inicial=produto_data.valor_minimo_aporte_inicial,
+        valor_minimo_aporte_extra=produto_data.valor_minimo_aporte_extra,
+        idade_de_entrada=produto_data.idade_de_entrada,
+        idade_de_saida=produto_data.idade_de_saida,
+        carencia_inicial_de_resgate=produto_data.carencia_inicial_de_resgate,
+        carencia_entre_resgates=produto_data.carencia_entre_resgates,
     )
     assert new_produto == produto

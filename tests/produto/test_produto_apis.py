@@ -25,13 +25,26 @@ def test_register_produto_api_success(
         "carenciaEntreResgates": 30,
     }
 
-    produto = create_produto(**{"expiracaoDeVenda": expiracao_de_venda, **produto_data})
+    produto = create_produto(
+        **{
+            "nome": produto_data["nome"],
+            "susep": produto_data["susep"],
+            "expiracao_de_venda": produto_data["expiracaoDeVenda"],
+            "valor_minimo_aporte_inicial": produto_data["valorMinimoAporteInicial"],
+            "valor_minimo_aporte_extra": produto_data["valorMinimoAporteExtra"],
+            "idade_de_entrada": produto_data["idadeDeEntrada"],
+            "idade_de_saida": produto_data["idadeDeSaida"],
+            "carencia_inicial_de_resgate": produto_data["carenciaInicialDeResgate"],
+            "carencia_entre_resgates": produto_data["carenciaEntreResgates"],
+        }
+    )
 
     produto.id = str(uuid4())
 
     mock_produto_service.create_produto.return_value = produto
 
     response = api_client.post("/api/produtos", json=produto_data)
+    print("response.json() = ", response.json())
     assert response.status_code == 200
     assert response.json() == {"id": str(produto.id)}
 
