@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Teste técnico brasil prev"
 authors = ["Lucas Gomes"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -14,6 +15,13 @@ pydantic-settings = "^2.2.1"
 psycopg2-binary = "^2.9.9"
 
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+alembic = "^1.13.1"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[virtualenvs]
+in-project = true

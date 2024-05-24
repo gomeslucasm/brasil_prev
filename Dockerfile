@@ -1,10 +1,28 @@
-FROM python:3.11-slim
+FROM python:3.11-slim as base
 
 WORKDIR /app
 
 COPY pyproject.toml poetry.lock /app/
-RUN pip install poetry && poetry install
+RUN pip install poetry
 
 COPY ./api /app/api
+COPY alembic.ini /app/alembic.ini
+COPY ./alembic /app/alembic
 
-CMD ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Development stage
+FROM base as development
+
+COPY ./tests /app/tests
+COPY ./pytest.ini /app
+
+
+RUN poetry install --with dev
+
+CMD ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Production stage
+FROM base as production
+
+RUN poetry install --no-dev
+
+CMD ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
