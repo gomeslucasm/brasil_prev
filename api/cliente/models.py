@@ -13,6 +13,6 @@ class Client(BaseDBModel):
     cpf = mapped_column(String, unique=True, nullable=False)
     nome = mapped_column(String, nullable=False)
     email = mapped_column(String, unique=True, nullable=False)
-    dataDeNascimento = mapped_column(DateTime, nullable=False)
+    data_de_nascimento = mapped_column(DateTime, nullable=False)
     genero = mapped_column(String, nullable=False)
     rendaMensal = mapped_column(NUMERIC(precision=10, scale=2), nullable=False)

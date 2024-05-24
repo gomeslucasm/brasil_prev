@@ -17,7 +17,7 @@ def create_client():
         cpf: str,
         nome: str,
         email: str,
-        dataDeNascimento: datetime,
+        data_de_nascimento: datetime,
         genero: str,
         rendaMensal: float,
     ) -> Client:
@@ -25,7 +25,7 @@ def create_client():
             cpf=cpf,
             nome=nome,
             email=email,
-            dataDeNascimento=dataDeNascimento,
+            data_de_nascimento=data_de_nascimento,
             genero=genero,
             rendaMensal=rendaMensal,
         )
@@ -42,7 +42,7 @@ def create_client_on_db(
         cpf: str,
         nome: str,
         email: str,
-        dataDeNascimento: datetime,
+        data_de_nascimento: datetime,
         genero: str,
         rendaMensal: float,
     ) -> Client:
@@ -50,7 +50,7 @@ def create_client_on_db(
             cpf=cpf,
             nome=nome,
             email=email,
-            dataDeNascimento=dataDeNascimento,
+            data_de_nascimento=data_de_nascimento,
             genero=genero,
             rendaMensal=rendaMensal,
         )
@@ -69,7 +69,7 @@ def new_client(create_client_on_db, delete_entity_on_db):
         cpf="12345678900",
         nome="Test User",
         email="test@example.com",
-        dataDeNascimento=birth_date,
+        data_de_nascimento=birth_date,
         genero="masculino",
         rendaMensal=1000.0,
     )

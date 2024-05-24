@@ -19,25 +19,30 @@ def test_register_client_api_success(
         "cpf": valid_cpf,
         "nome": "Test User",
         "email": "test@example.com",
-        "dataDeNascimento": birth_date.isoformat(),
         "genero": "feminino",
         "rendaMensal": 1000.0,
     }
 
-    client = create_client(**{"dataDeNascimento": birth_date, **client_data})
+    client = create_client(**{"data_de_nascimento": birth_date, **client_data})
 
     client.id = str(uuid4())
 
     mock_client_service.create_client.return_value = client
 
-    response = api_client.post("/api/clients", json=client_data)
+    response = api_client.post(
+        "/api/clients",
+        json={
+            **client_data,
+            "dataDeNascimento": birth_date.isoformat(),
+        },
+    )
     assert response.status_code == 200
     assert response.json() == {
         "id": str(mock_client_service.create_client.return_value.id)
     }
 
     mock_client_service.create_client.assert_called_once_with(
-        ClientCreate(**client_data)
+        ClientCreate(**{"dataDeNascimento": birth_date, **client_data})
     )
 
     # test other cpf format
@@ -45,11 +50,16 @@ def test_register_client_api_success(
         "cpf": valid_cpf_only_numbers,
         "nome": "Test User",
         "email": "test@example.com",
-        "dataDeNascimento": birth_date.isoformat(),
         "genero": "feminino",
         "rendaMensal": 1000.0,
     }
-    response = api_client.post("/api/clients", json=client_data)
+    response = api_client.post(
+        "/api/clients",
+        json={
+            **client_data,
+            "dataDeNascimento": birth_date.isoformat(),
+        },
+    )
     assert response.status_code == 200
 
 

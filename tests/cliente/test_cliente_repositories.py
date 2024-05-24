@@ -13,7 +13,7 @@ def test_create_client(db, delete_entity_on_db, valid_cpf_only_numbers: str):
         "cpf": valid_cpf_only_numbers,
         "nome": "Test User",
         "email": "test@example.com",
-        "dataDeNascimento": birth_date,
+        "data_de_nascimento": birth_date,
         "genero": "masculino",
         "rendaMensal": 1000.0,
     }
@@ -22,8 +22,8 @@ def test_create_client(db, delete_entity_on_db, valid_cpf_only_numbers: str):
     assert client.nome == client_data["nome"]
     assert client.email == client_data["email"]
     assert (
-        client.dataDeNascimento.isoformat()
-        == client_data["dataDeNascimento"].isoformat()
+        client.data_de_nascimento.isoformat()
+        == client_data["data_de_nascimento"].isoformat()
     )
     assert client.genero == client_data["genero"]
     assert client.rendaMensal == client_data["rendaMensal"]

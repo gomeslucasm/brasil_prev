@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from uuid import UUID
 from api.common.schemas.types import CPFPydanticType
@@ -8,7 +8,7 @@ class ClientCreate(BaseModel):
     cpf: CPFPydanticType
     nome: str
     email: EmailStr
-    dataDeNascimento: datetime
+    data_de_nascimento: datetime = Field(alias="dataDeNascimento")
     genero: str
     rendaMensal: float
 

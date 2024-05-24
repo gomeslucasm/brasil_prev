@@ -18,7 +18,7 @@ class IClientRepository(Protocol):
         cpf: str,
         nome: str,
         email: str,
-        dataDeNascimento: datetime,
+        data_de_nascimento: datetime,
         genero: str,
         rendaMensal: float
     ) -> Client: ...
@@ -40,7 +40,7 @@ class ClientDatabaseRepository(BaseDatabaseRepository[Client]):
         cpf: str,
         nome: str,
         email: str,
-        dataDeNascimento: datetime,
+        data_de_nascimento: datetime,
         genero: str,
         rendaMensal: float
     ) -> Client:
@@ -48,7 +48,7 @@ class ClientDatabaseRepository(BaseDatabaseRepository[Client]):
             cpf=cpf,
             nome=nome,
             email=email,
-            dataDeNascimento=dataDeNascimento,
+            data_de_nascimento=data_de_nascimento,
             genero=genero,
             rendaMensal=rendaMensal,
         )

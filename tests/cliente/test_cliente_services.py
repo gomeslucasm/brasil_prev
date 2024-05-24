@@ -24,7 +24,7 @@ def test_create_client_service(client_service, mock_client_repository, valid_cpf
         cpf=client_data.cpf,
         nome=client_data.nome,
         email=client_data.email,
-        dataDeNascimento=client_data.dataDeNascimento,
+        data_de_nascimento=client_data.data_de_nascimento,
         genero=client_data.genero,
         rendaMensal=client_data.rendaMensal,
     )
@@ -48,7 +48,7 @@ def test_create_client_error_on_existent_cpf(
         cpf=client_data.cpf,
         nome="Test User",
         email="test@example.com",
-        dataDeNascimento=birth_date,
+        data_de_nascimento=birth_date,
         genero="Masculino",
         rendaMensal=1000.0,
     )

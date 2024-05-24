@@ -15,7 +15,7 @@ class ClientService:
             cpf=client.cpf,
             nome=client.nome,
             email=client.email,
-            dataDeNascimento=client.dataDeNascimento,
+            data_de_nascimento=client.data_de_nascimento,
             genero=client.genero,
             rendaMensal=client.rendaMensal,
         )
