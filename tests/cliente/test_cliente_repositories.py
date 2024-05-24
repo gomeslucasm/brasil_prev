@@ -15,7 +15,7 @@ def test_create_client(db, delete_entity_on_db, valid_cpf_only_numbers: str):
         "email": "test@example.com",
         "data_de_nascimento": birth_date,
         "genero": "masculino",
-        "rendaMensal": 1000.0,
+        "renda_mensal": 1000.0,
     }
     client = repository.create(**client_data)
     assert client.cpf == client_data["cpf"]
@@ -26,7 +26,7 @@ def test_create_client(db, delete_entity_on_db, valid_cpf_only_numbers: str):
         == client_data["data_de_nascimento"].isoformat()
     )
     assert client.genero == client_data["genero"]
-    assert client.rendaMensal == client_data["rendaMensal"]
+    assert client.renda_mensal == client_data["renda_mensal"]
 
     delete_entity_on_db(client)
 

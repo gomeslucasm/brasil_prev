@@ -15,4 +15,4 @@ class Client(BaseDBModel):
     email = mapped_column(String, unique=True, nullable=False)
     data_de_nascimento = mapped_column(DateTime, nullable=False)
     genero = mapped_column(String, nullable=False)
-    rendaMensal = mapped_column(NUMERIC(precision=10, scale=2), nullable=False)
+    renda_mensal = mapped_column(NUMERIC(precision=10, scale=2), nullable=False)

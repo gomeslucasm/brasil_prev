@@ -10,7 +10,7 @@ class ClientCreate(BaseModel):
     email: EmailStr
     data_de_nascimento: datetime = Field(alias="dataDeNascimento")
     genero: str
-    rendaMensal: float
+    renda_mensal: float = Field(alias="rendaMensal")
 
 
 class ClientResponse(BaseModel):

@@ -20,10 +20,11 @@ def test_register_client_api_success(
         "nome": "Test User",
         "email": "test@example.com",
         "genero": "feminino",
-        "rendaMensal": 1000.0,
     }
 
-    client = create_client(**{"data_de_nascimento": birth_date, **client_data})
+    client = create_client(
+        **{"data_de_nascimento": birth_date, "renda_mensal": 1000.0, **client_data}
+    )
 
     client.id = str(uuid4())
 
@@ -34,6 +35,7 @@ def test_register_client_api_success(
         json={
             **client_data,
             "dataDeNascimento": birth_date.isoformat(),
+            "rendaMensal": 1000.0,
         },
     )
     assert response.status_code == 200
@@ -42,7 +44,9 @@ def test_register_client_api_success(
     }
 
     mock_client_service.create_client.assert_called_once_with(
-        ClientCreate(**{"dataDeNascimento": birth_date, **client_data})
+        ClientCreate(
+            **{"dataDeNascimento": birth_date, "rendaMensal": 1000.0, **client_data}
+        )
     )
 
     # test other cpf format

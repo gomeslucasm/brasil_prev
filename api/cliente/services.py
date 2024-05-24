@@ -17,6 +17,6 @@ class ClientService:
             email=client.email,
             data_de_nascimento=client.data_de_nascimento,
             genero=client.genero,
-            rendaMensal=client.rendaMensal,
+            renda_mensal=client.renda_mensal,
         )
         return new_client

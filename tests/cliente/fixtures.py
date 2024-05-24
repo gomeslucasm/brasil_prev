@@ -19,7 +19,7 @@ def create_client():
         email: str,
         data_de_nascimento: datetime,
         genero: str,
-        rendaMensal: float,
+        renda_mensal: float,
     ) -> Client:
         return Client(
             cpf=cpf,
@@ -27,7 +27,7 @@ def create_client():
             email=email,
             data_de_nascimento=data_de_nascimento,
             genero=genero,
-            rendaMensal=rendaMensal,
+            renda_mensal=renda_mensal,
         )
 
     return fn
@@ -44,7 +44,7 @@ def create_client_on_db(
         email: str,
         data_de_nascimento: datetime,
         genero: str,
-        rendaMensal: float,
+        renda_mensal: float,
     ) -> Client:
         client = create_client(
             cpf=cpf,
@@ -52,7 +52,7 @@ def create_client_on_db(
             email=email,
             data_de_nascimento=data_de_nascimento,
             genero=genero,
-            rendaMensal=rendaMensal,
+            renda_mensal=renda_mensal,
         )
         db.add(client)
         db.commit()
@@ -71,7 +71,7 @@ def new_client(create_client_on_db, delete_entity_on_db):
         email="test@example.com",
         data_de_nascimento=birth_date,
         genero="masculino",
-        rendaMensal=1000.0,
+        renda_mensal=1000.0,
     )
 
     yield client

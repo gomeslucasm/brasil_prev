@@ -20,7 +20,7 @@ class IClientRepository(Protocol):
         email: str,
         data_de_nascimento: datetime,
         genero: str,
-        rendaMensal: float
+        renda_mensal: float
     ) -> Client: ...
 
 
@@ -42,7 +42,7 @@ class ClientDatabaseRepository(BaseDatabaseRepository[Client]):
         email: str,
         data_de_nascimento: datetime,
         genero: str,
-        rendaMensal: float
+        renda_mensal: float
     ) -> Client:
         db_obj = Client(
             cpf=cpf,
@@ -50,7 +50,7 @@ class ClientDatabaseRepository(BaseDatabaseRepository[Client]):
             email=email,
             data_de_nascimento=data_de_nascimento,
             genero=genero,
-            rendaMensal=rendaMensal,
+            renda_mensal=renda_mensal,
         )
         self.add(db_obj)
         self.commit()
