@@ -15,6 +15,7 @@ def register_apis(app):
 
 def register_models():
     from api.cliente.models import Client
+    from api.produto.models import Produto
 
 
 register_models()
