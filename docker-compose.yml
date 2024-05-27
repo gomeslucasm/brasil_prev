@@ -11,6 +11,7 @@ services:
       - ./api:/app/api
       - ./tests:/app/tests
       - ./alembic:/app/alembic
+      - ./htmlcov:/app/htmlcov
     restart: always
     depends_on:
       - db
