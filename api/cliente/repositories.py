@@ -7,14 +7,11 @@ from api.cliente.models import Client
 from abc import ABC, abstractmethod
 
 
-class IClientRepository(ABC):
-    @abstractmethod
+class IClientRepository(Protocol):
     def get_by_id(self, id: str | UUID) -> Optional[Client]: ...
 
-    @abstractmethod
     def get_by_cpf(self, cpf: str) -> Optional[Client]: ...
 
-    @abstractmethod
     def create(
         self,
         *,

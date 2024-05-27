@@ -1,18 +1,15 @@
-from typing import Optional
+from typing import Optional, Protocol
 from uuid import UUID
 from sqlalchemy.orm import Session
 from api.common.bases.repository import BaseDatabaseRepository
 from api.produto.models import Produto
 from datetime import datetime
 from api.produto.models import Produto
-from abc import ABC, abstractmethod
 
 
-class IProdutoRepository(ABC):
-    @abstractmethod
+class IProdutoRepository(Protocol):
     def get_by_id(self, id: str | UUID) -> Optional[Produto]: ...
 
-    @abstractmethod
     def create(
         self,
         *,
