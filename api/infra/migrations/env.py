@@ -6,6 +6,8 @@ from alembic import context
 import os
 import sys
 
+from api.main import register_models
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 
@@ -27,6 +29,7 @@ from api.infra.db import Base
 
 target_metadata = Base.metadata
 
+register_models()
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
