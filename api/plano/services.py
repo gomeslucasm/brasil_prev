@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from api.common.errors import NotFoundError, ValidationError
+from api.common.utils import adjust_datetime_to_utc
 from api.plano.repositories import IPlanoRepository, PlanoDatabaseRepository
 from api.produto.repositories import IProdutoRepository, ProdutoDatabaseRepository
 from api.cliente.repositories import ClientDatabaseRepository, IClientRepository
@@ -28,7 +29,9 @@ class PlanoService:
     def validate_plano(
         self, *, produto: Produto, cliente: Client, plano: PlanoCreate
     ) -> ProdutoData:
-        if produto.expiracao_de_venda < plano.data_da_contratacao:
+        if adjust_datetime_to_utc(produto.expiracao_de_venda) < adjust_datetime_to_utc(
+            plano.data_da_contratacao
+        ):
             raise ValidationError(
                 "Não é possível contratar um produto com prazo de venda expirado."
             )
@@ -37,7 +40,8 @@ class PlanoService:
                 "O valor do aporte é menor que o valor mínimo permitido."
             )
         idade_cliente = (
-            plano.data_da_contratacao - cliente.data_de_nascimento
+            adjust_datetime_to_utc(plano.data_da_contratacao)
+            - adjust_datetime_to_utc(cliente.data_de_nascimento)
         ).days // 365
         if idade_cliente < produto.idade_de_entrada:
             raise ValidationError("O cliente não atende à idade mínima de entrada.")
@@ -47,7 +51,7 @@ class PlanoService:
             )
 
         produto_data = ProdutoData(
-            id_produto=produto.id_produto,
+            id_produto=produto.id,
             nome=produto.nome,
             susep=produto.susep,
             expiracao_de_venda=produto.expiracao_de_venda,
@@ -97,8 +101,9 @@ class PlanoService:
         return True
 
     def __carencia_inicial_de_resgate_is_valid(self, *, plano_data: PlanoData):
-        return datetime.now() > (
-            plano_data.created_on
+        print("plano_data.data_da_contratacao = ", plano_data.data_da_contratacao)
+        return adjust_datetime_to_utc(datetime.now()) > (
+            adjust_datetime_to_utc(plano_data.data_da_contratacao)
             + timedelta(days=plano_data.produto_carencia_inicial_de_resgate)
         )
 
@@ -111,9 +116,9 @@ class PlanoService:
             return True
 
         return (
-            last_retirada.created_on
+            adjust_datetime_to_utc(last_retirada.created_on)
             + timedelta(days=plano_data.produto_carencia_entre_resgates)
-        ) < datetime.now()
+        ) < adjust_datetime_to_utc(datetime.now())
 
     def validate_retirada(self, *, id_plano: UUID, value: float) -> bool:
         plano_data = self.get_plano_data(id_plano=id_plano)

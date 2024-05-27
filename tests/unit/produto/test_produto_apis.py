@@ -2,7 +2,7 @@ from uuid import uuid4
 from api.produto.models import Produto
 from tests.fixtures.api import *
 from api.produto.schemas import ProdutoCreate
-from tests.produto.fixtures import *
+from tests.unit.produto.fixtures import *
 from datetime import datetime
 
 

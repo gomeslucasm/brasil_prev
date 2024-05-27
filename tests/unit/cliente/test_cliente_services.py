@@ -1,6 +1,6 @@
 from api.cliente.schemas import ClientCreate
 from api.common.errors import ValidationError
-from tests.cliente.fixtures import *
+from tests.unit.cliente.fixtures import *
 from datetime import datetime
 
 

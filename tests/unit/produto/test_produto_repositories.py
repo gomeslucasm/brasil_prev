@@ -1,6 +1,6 @@
 from api.produto.repositories import ProdutoDatabaseRepository
 from datetime import datetime
-from tests.produto.fixtures import *
+from tests.unit.produto.fixtures import *
 from tests.fixtures.db import *
 
 

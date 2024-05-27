@@ -6,9 +6,9 @@ from api.plano.services import PlanoService
 from unittest.mock import Mock
 from uuid import uuid4
 from api.plano.entities import ProdutoData
-from tests.plano.fixtures import *
-from tests.produto.fixtures import *
-from tests.cliente.fixtures import *
+from tests.unit.plano.fixtures import *
+from tests.unit.produto.fixtures import *
+from tests.unit.cliente.fixtures import *
 
 
 def test_create_plano_service(
@@ -50,7 +50,7 @@ def test_create_plano_service(
     assert new_plano == plano_data
 
     produto_data = ProdutoData(
-        id_produto=produto.id_produto,
+        id_produto=produto.id,
         nome=produto.nome,
         susep=produto.susep,
         expiracao_de_venda=produto.expiracao_de_venda,
@@ -95,7 +95,7 @@ def test_validate_plano():
     )
 
     produto = Mock(
-        id_produto=uuid4(),
+        id=uuid4(),
         nome="Produto Teste",
         susep="123456",
         expiracao_de_venda=datetime(year=2023, month=1, day=1),
@@ -114,7 +114,7 @@ def test_validate_plano():
 
     plano_data = PlanoCreate(
         idCliente=cliente.id,
-        idProduto=produto.id_produto,
+        idProduto=produto.id,
         aporte=2000.0,
         dataDaContratacao=datetime(year=2022, month=4, day=5),
         idadeDeAposentadoria=60,
@@ -123,7 +123,7 @@ def test_validate_plano():
     produto_data = plano_service.validate_plano(
         produto=produto, cliente=cliente, plano=plano_data
     )
-    assert produto_data.id_produto == produto.id_produto
+    assert produto_data.id_produto == produto.id
 
     plano_data.data_da_contratacao = datetime(year=2024, month=1, day=1)
     with pytest.raises(
@@ -132,7 +132,6 @@ def test_validate_plano():
     ):
         plano_service.validate_plano(produto=produto, cliente=cliente, plano=plano_data)
 
-    # Teste de falha de valor de aporte mínimo
     plano_data.data_da_contratacao = datetime(year=2022, month=4, day=5)
     plano_data.aporte = 500.0
     with pytest.raises(
@@ -229,7 +228,7 @@ def test_validate_retirada():
         id=id_plano,
         aporte=1000,
         produto_carencia_inicial_de_resgate=60,
-        created_on=datetime.now() - timedelta(days=10),
+        data_da_contratacao=(datetime.now() - timedelta(days=10)),
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
@@ -245,7 +244,7 @@ def test_validate_retirada():
         aporte=1000,
         produto_carencia_inicial_de_resgate=60,
         produto_carencia_entre_resgates=20,
-        created_on=datetime.now() - timedelta(days=70),
+        data_da_contratacao=datetime.now() - timedelta(days=70),
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
@@ -265,7 +264,7 @@ def test_validate_retirada():
         aporte=1000,
         produto_carencia_inicial_de_resgate=60,
         produto_carencia_entre_resgates=20,
-        created_on=datetime.now() - timedelta(days=70),
+        data_da_contratacao=datetime.now() - timedelta(days=70),
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
@@ -278,12 +277,12 @@ def test_validate_retirada():
         aporte=1000,
         produto_carencia_inicial_de_resgate=10,
         produto_carencia_entre_resgates=20,
-        created_on=datetime.now() - timedelta(days=70),
+        data_da_contratacao=datetime.now() - timedelta(days=70),
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
     mock_plano_repository.get_last_retirada.return_value = Mock(
-        created_on=plano_data.created_on
+        created_on=plano_data.data_da_contratacao
         + timedelta(days=plano_data.produto_carencia_entre_resgates + 1)
     )
 

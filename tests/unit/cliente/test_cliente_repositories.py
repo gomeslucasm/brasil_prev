@@ -2,7 +2,7 @@ from typing import Callable
 from api.cliente.models import Client
 from api.cliente.repositories import ClientDatabaseRepository
 from datetime import datetime
-from tests.cliente.fixtures import *
+from tests.unit.cliente.fixtures import *
 from tests.fixtures.db import *
 
 

@@ -8,7 +8,7 @@ from uuid import UUID, uuid4
 from api.plano.repositories import IPlanoRepository
 from tests.fixtures.db import db
 from api.produto.models import Produto
-from tests.produto.fixtures import *
+from tests.unit.produto.fixtures import *
 
 
 @pytest.fixture

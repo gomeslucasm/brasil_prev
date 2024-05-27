@@ -5,8 +5,8 @@ from api.plano.models import Plano, ProdutoPlano, PlanoOperation
 from api.plano.repositories import PlanoDatabaseRepository
 from api.plano.entities import ProdutoData
 from tests.fixtures.db import db
-from tests.plano.fixtures import *
-from tests.cliente.fixtures import *
+from tests.unit.plano.fixtures import *
+from tests.unit.cliente.fixtures import *
 
 
 def test_create_plano(db: Session, new_client, new_produto):

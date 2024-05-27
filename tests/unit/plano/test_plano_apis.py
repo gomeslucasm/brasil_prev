@@ -2,7 +2,7 @@ from uuid import uuid4
 from api.plano.models import Plano
 from tests.fixtures.api import *
 from api.plano.schemas import PlanoAporteExtra, PlanoCreate, PlanoRetirada
-from tests.plano.fixtures import *
+from tests.unit.plano.fixtures import *
 from datetime import datetime
 
 

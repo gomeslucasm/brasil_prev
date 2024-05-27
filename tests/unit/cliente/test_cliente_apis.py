@@ -2,7 +2,7 @@ from uuid import uuid4
 from api.cliente.models import Client
 from tests.fixtures.api import *
 from api.cliente.schemas import ClientCreate
-from tests.cliente.fixtures import *
+from tests.unit.cliente.fixtures import *
 from datetime import datetime
 
 

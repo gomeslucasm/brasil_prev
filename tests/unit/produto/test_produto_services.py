@@ -1,5 +1,5 @@
 from api.produto.schemas import ProdutoCreate
-from tests.produto.fixtures import *
+from tests.unit.produto.fixtures import *
 from datetime import datetime
 from uuid import uuid4
 
