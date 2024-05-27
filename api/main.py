@@ -1,15 +1,16 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from starlette.responses import JSONResponse, PlainTextResponse
+from fastapi import FastAPI
+from starlette.responses import JSONResponse
 
 from api.common.errors import BaseError
-from .infra.db import get_db
 from api.cliente.apis import client_router
 from api.produto.apis import produto_router
 from api.plano.apis import plano_router
-from sqlalchemy.sql import text
 
-app = FastAPI()
+
+app = FastAPI(
+    title="Brasilprev",
+    summary="Desafio Técnico Brasilprev – Backend.",
+)
 
 
 def register_apis(app):
