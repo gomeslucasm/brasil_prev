@@ -73,6 +73,8 @@ docker-compose down
 
 ### Testes
 
+Para rodar os testes é necessário que os containers estejam ativos.
+
 1. Executar Testes
 
 Para executar todos os testes, utilize:
