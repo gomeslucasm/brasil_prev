@@ -6,8 +6,6 @@ from alembic import context
 import os
 import sys
 
-from api.main import register_models
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 
@@ -26,6 +24,7 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from api.config import settings
 from api.infra.db import Base
+from api.main import register_models
 
 target_metadata = Base.metadata
 
