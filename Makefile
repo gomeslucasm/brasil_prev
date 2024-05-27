@@ -1,3 +1,6 @@
+build:
+	docker-compose build --no-cache
+
 run:
 	docker-compose up
 
@@ -24,4 +27,4 @@ test:
 
 .PHONY: test-coverage
 test-coverage:
-	docker-compose exec -it web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html $(test_path)
+	docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html $(test_path)
