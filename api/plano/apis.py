@@ -15,6 +15,9 @@ plano_router = APIRouter()
 
 @plano_router.post("/planos", response_model=PlanoResponse)
 def register_plano(plano: PlanoCreate, db: Session = Depends(get_db)):
+    """
+    Contratação de plano
+    """
     plano_service = create_plano_service(db)
     new_plano = plano_service.create_plano(plano)
     return new_plano
@@ -24,6 +27,9 @@ def register_plano(plano: PlanoCreate, db: Session = Depends(get_db)):
 def aporte_extra_plano(
     plano_aporte_extra: PlanoAporteExtra, db: Session = Depends(get_db)
 ):
+    """
+    Aporte extra
+    """
     plano_service = create_plano_service(db)
     plano_service.validate_aporte_extra(
         id_plano=plano_aporte_extra.id_plano, value=plano_aporte_extra.value
@@ -33,6 +39,9 @@ def aporte_extra_plano(
 
 @plano_router.post("/planos/retirada", response_model=PlanoOperationResponse)
 def retirada_plano(plano_retirada: PlanoRetirada, db: Session = Depends(get_db)):
+    """
+    Resgate
+    """
     plano_service = create_plano_service(db)
     plano_service.validate_retirada(
         id_plano=plano_retirada.id_plano, value=plano_retirada.value

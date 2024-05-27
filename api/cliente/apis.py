@@ -10,6 +10,9 @@ client_router = APIRouter()
 
 @client_router.post("/clients", response_model=ClientResponse)
 def register_client(client: ClientCreate, db: Session = Depends(get_db)):
+    """
+    Registrar cliente
+    """
     client_repository = ClientDatabaseRepository(db)
     client_service = ClientService(client_repository)
     new_client = client_service.create_client(client)

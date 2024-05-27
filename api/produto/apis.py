@@ -10,6 +10,9 @@ produto_router = APIRouter()
 
 @produto_router.post("/produtos", response_model=ProdutoResponse)
 def register_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
+    """
+    Registrar produto
+    """
     produto_repository = ProdutoDatabaseRepository(db)
     produto_service = ProdutoService(produto_repository)
     new_produto = produto_service.create_produto(produto)
