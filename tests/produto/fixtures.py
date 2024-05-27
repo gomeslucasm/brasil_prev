@@ -1,8 +1,10 @@
 from typing import Callable, Optional
+from uuid import UUID
 import pytest
 from unittest.mock import Mock, patch
 
 from sqlalchemy.orm import Session
+from api.plano.models import Plano
 from api.produto.models import Produto
 from api.produto.services import ProdutoService
 from api.produto.repositories import IProdutoRepository
@@ -92,6 +94,17 @@ def new_produto(create_produto_on_db, delete_entity_on_db):
     yield produto
 
     delete_entity_on_db(produto)
+
+
+@pytest.fixture
+def get_plano_by_id(db):
+    def fn(*, id_plano: UUID):
+        plano = db.query(Plano).filter(Plano.id == id_plano).first()
+        print("plano.id=", plano.id)
+
+        return plano
+
+    return fn
 
 
 @pytest.fixture

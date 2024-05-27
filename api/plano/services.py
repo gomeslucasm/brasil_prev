@@ -1,13 +1,17 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
-from api.cliente.models import Client
+
+from api.common.errors import NotFoundError, ValidationError
 from api.plano.repositories import IPlanoRepository, PlanoDatabaseRepository
-from api.produto.models import Produto
 from api.produto.repositories import IProdutoRepository, ProdutoDatabaseRepository
 from api.cliente.repositories import ClientDatabaseRepository, IClientRepository
-from api.plano.schemas import PlanoCreate
-from api.plano.models import Plano
-from api.plano.entities import ProdutoData
+from api.plano.schemas import PlanoAporteExtra, PlanoCreate, PlanoRetirada
+from api.plano.models import Plano, PlanoOperation
+from api.produto.models import Produto
+from api.cliente.models import Client
+from api.plano.entities import ProdutoData, PlanoData
 
 
 class PlanoService:
@@ -25,30 +29,25 @@ class PlanoService:
         self, *, produto: Produto, cliente: Client, plano: PlanoCreate
     ) -> ProdutoData:
         if produto.expiracao_de_venda < plano.data_da_contratacao:
-            raise Exception(
+            raise ValidationError(
                 "Não é possível contratar um produto com prazo de venda expirado."
             )
-
         if plano.aporte < produto.valor_minimo_aporte_inicial:
-            raise Exception("O valor do aporte é menor que o valor mínimo permitido.")
-
-        if cliente.data_de_nascimento:
-            idade_cliente = (
-                plano.data_da_contratacao - cliente.data_de_nascimento
-            ).days // 365
-        else:
-            raise Exception("Data de nascimento do cliente não encontrada.")
-
+            raise ValidationError(
+                "O valor do aporte é menor que o valor mínimo permitido."
+            )
+        idade_cliente = (
+            plano.data_da_contratacao - cliente.data_de_nascimento
+        ).days // 365
         if idade_cliente < produto.idade_de_entrada:
-            raise Exception("O cliente não atende à idade mínima de entrada.")
-
+            raise ValidationError("O cliente não atende à idade mínima de entrada.")
         if plano.idade_de_aposentadoria > produto.idade_de_saida:
-            raise Exception(
+            raise ValidationError(
                 "A idade de aposentadoria é maior que a idade máxima de saída."
             )
 
         produto_data = ProdutoData(
-            id_produto=plano.id_produto,
+            id_produto=produto.id_produto,
             nome=produto.nome,
             susep=produto.susep,
             expiracao_de_venda=produto.expiracao_de_venda,
@@ -63,28 +62,88 @@ class PlanoService:
         return produto_data
 
     def create_plano(self, plano: PlanoCreate) -> Plano:
-        cliente = self.cliente_repository.get_by_id(plano.id_cliente)
-
-        if not cliente:
-            raise Exception("Cliente não encontrado.")
-
         produto = self.produto_repository.get_by_id(plano.id_produto)
-
         if not produto:
-            raise Exception("Produto não encontrado.")
-
+            raise NotFoundError("Produto não encontrado.")
+        cliente = self.cliente_repository.get_by_id(plano.id_cliente)
+        if not cliente:
+            raise NotFoundError("Cliente não encontrado.")
         produto_data = self.validate_plano(
-            cliente=cliente, produto=produto, plano=plano
+            produto=produto, cliente=cliente, plano=plano
         )
-
         new_plano = self.plano_repository.create(
             id_cliente=plano.id_cliente,
+            produto_data=produto_data,
             aporte=plano.aporte,
             data_da_contratacao=plano.data_da_contratacao,
             idade_de_aposentadoria=plano.idade_de_aposentadoria,
-            produto_data=produto_data,
         )
         return new_plano
+
+    def get_plano_data(self, id_plano: UUID):
+        plano_data = self.plano_repository.get_plano_data(id_plano=id_plano)
+
+        if not plano_data:
+            raise NotFoundError("Plano not found")
+
+        return plano_data
+
+    def validate_aporte_extra(self, *, id_plano: UUID, value: float) -> bool:
+        plano_data = self.get_plano_data(id_plano=id_plano)
+
+        if value < plano_data.produto_valor_minimo_aporte_extra:
+            raise ValidationError("O valor de aporte extra é menor que o permitido")
+
+        return True
+
+    def __carencia_inicial_de_resgate_is_valid(self, *, plano_data: PlanoData):
+        return datetime.now() > (
+            plano_data.created_on
+            + timedelta(days=plano_data.produto_carencia_inicial_de_resgate)
+        )
+
+    def __carencia_entre_resgates_is_valid(
+        self, *, id_plano: UUID, plano_data: PlanoData
+    ):
+        last_retirada = self.plano_repository.get_last_retirada(id_plano=id_plano)
+
+        if not last_retirada:
+            return True
+
+        return (
+            last_retirada.created_on
+            + timedelta(days=plano_data.produto_carencia_entre_resgates)
+        ) < datetime.now()
+
+    def validate_retirada(self, *, id_plano: UUID, value: float) -> bool:
+        plano_data = self.get_plano_data(id_plano=id_plano)
+
+        if plano_data.aporte < value:
+            raise ValidationError("O valor de aporte é menor que o de resgate")
+
+        if not self.__carencia_inicial_de_resgate_is_valid(plano_data=plano_data):
+            raise ValidationError(
+                f"Ainda não é possível fazer resgatas devido ao tempo de carencia inicial de {plano_data.produto_carencia_inicial_de_resgate}"
+            )
+
+        if not self.__carencia_entre_resgates_is_valid(
+            id_plano=id_plano, plano_data=plano_data
+        ):
+            raise ValidationError(
+                f"Não é possível fazer o resgate por que o último resgate foi feito a menos de {plano_data.produto_carencia_entre_resgates} dias"
+            )
+
+        return True
+
+    def aporte_extra(self, plano_aporte_extra: PlanoAporteExtra) -> PlanoOperation:
+        return self.plano_repository.aporte_extra(
+            id_plano=plano_aporte_extra.id_plano, value=plano_aporte_extra.value
+        )
+
+    def retirada(self, plano_retirada: PlanoRetirada):
+        return self.plano_repository.retirada(
+            id_plano=plano_retirada.id_plano, value=plano_retirada.value
+        )
 
 
 def create_plano_service(db: Session) -> PlanoService:

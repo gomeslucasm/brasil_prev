@@ -1,7 +1,7 @@
 from uuid import uuid4
 from api.plano.models import Plano
 from tests.fixtures.api import *
-from api.plano.schemas import PlanoCreate
+from api.plano.schemas import PlanoAporteExtra, PlanoCreate, PlanoRetirada
 from tests.plano.fixtures import *
 from datetime import datetime
 
@@ -54,4 +54,86 @@ def test_register_plano_api_invalid_data(api_client):
     }
 
     response = api_client.post("/api/planos", json=plano_data)
+    assert response.status_code == 422
+
+
+def test_aporte_extra_api(api_client, mock_plano_service):
+    id_plano = uuid4()
+    aporte_extra = {"idPlano": str(id_plano), "valorAporte": 1000}
+
+    aporte_extra_mock = PlanoAporteExtra(
+        idPlano=id_plano,
+        valorAporte=1000,
+    )
+
+    id_operation = uuid4()
+
+    mock_plano_service.validate_aporte_extra.return_value = True
+    mock_plano_service.aporte_extra.return_value = Mock(id=id_operation)
+
+    response = api_client.post("/api/planos/aporte", json=aporte_extra)
+
+    mock_plano_service.validate_aporte_extra.assert_called_once_with(
+        id_plano=aporte_extra_mock.id_plano, value=aporte_extra_mock.value
+    )
+
+    mock_plano_service.aporte_extra.assert_called_once_with(aporte_extra_mock)
+
+    assert response.json()["id"] == str(id_operation)
+    assert response.status_code == 200
+
+
+def test_aporte_extra_api_invalid_data(api_client, mock_plano_service):
+    id_plano = uuid4()
+    aporte_extra = {"idPlano": str(id_plano), "valorAporte": "invalid"}
+
+    response = api_client.post("/api/planos/aporte", json=aporte_extra)
+
+    assert response.status_code == 422
+
+    aporte_extra = {"idPlano": "invalid", "valorAporte": 1000}
+
+    response = api_client.post("/api/planos/aporte", json=aporte_extra)
+
+    assert response.status_code == 422
+
+
+def test_retirada_api(api_client, mock_plano_service):
+    id_plano = uuid4()
+    aporte_extra = {"idPlano": str(id_plano), "valorResgate": 1000}
+
+    plano_retirada_mock = PlanoRetirada(
+        idPlano=id_plano,
+        valorResgate=1000,
+    )
+
+    id_operation = uuid4()
+
+    mock_plano_service.validate_retirada.return_value = True
+    mock_plano_service.retirada.return_value = Mock(id=id_operation)
+
+    response = api_client.post("/api/planos/retirada", json=aporte_extra)
+
+    mock_plano_service.validate_retirada.assert_called_once_with(
+        id_plano=plano_retirada_mock.id_plano, value=plano_retirada_mock.value
+    )
+
+    mock_plano_service.retirada.assert_called_once_with(plano_retirada_mock)
+
+    assert response.json()["id"] == str(id_operation)
+    assert response.status_code == 200
+
+
+def test_retirada_api_invalid_data(api_client):
+    id_plano = uuid4()
+    aporte_extra = {"idPlano": str(id_plano), "valorResgate": "invalid"}
+
+    response = api_client.post("/api/planos/retirada", json=aporte_extra)
+
+    assert response.status_code == 422
+
+    aporte_extra = {"idPlano": "invalid", "valorResgate": 1000}
+
+    response = api_client.post("/api/planos/retirada", json=aporte_extra)
+
     assert response.status_code == 422

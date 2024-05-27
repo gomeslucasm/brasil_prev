@@ -1,5 +1,6 @@
 from api.cliente.repositories import IClientRepository
 from api.cliente.schemas import ClientCreate
+from api.common.errors import ValidationError
 
 
 class ClientService:
@@ -9,7 +10,7 @@ class ClientService:
     def create_client(self, client: ClientCreate):
         db_client = self.client_repository.get_by_cpf(client.cpf)
         if db_client:
-            raise Exception(f"Client with this CPF={client.cpf} already exists.")
+            raise ValidationError(f"Client with this CPF={client.cpf} already exists.")
 
         new_client = self.client_repository.create(
             cpf=client.cpf,

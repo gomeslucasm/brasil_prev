@@ -21,17 +21,13 @@ def register_apis(app):
 def register_models():
     from api.cliente.models import Client
     from api.produto.models import Produto
-    from api.plano.models import Plano, ProdutoPlano
+    from api.plano.models import Plano, ProdutoPlano, PlanoOperation
 
 
 def register_error_handlers(app):
     @app.exception_handler(Exception)
     async def handle_default_exception(request, exc):
         import logging
-
-        logger = logging.getLogger(__name__)
-
-        logger.error(request.url, str(exc))
 
         if isinstance(exc, BaseError):
             return PlainTextResponse(str(exc), status_code=400)
@@ -42,17 +38,3 @@ def register_error_handlers(app):
 register_models()
 register_apis(app)
 register_error_handlers(app)
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello, World!"}
-
-
-@app.get("/test-db")
-async def test_db(db: Session = Depends(get_db)):
-    try:
-        result = db.execute(text("SELECT 1"))
-        return {"status": "success", "result": result.scalar()}
-    except Exception as e:
-        return {"status": "error", "detail": str(e)}

@@ -11,9 +11,25 @@ class PlanoCreate(BaseModel):
     idade_de_aposentadoria: int = Field(alias="idadeDeAposentadoria")
 
 
+class PlanoAporteExtra(BaseModel):
+    id_plano: UUID = Field(alias="idPlano")
+    value: float = Field(alias="valorAporte")
+
+
+class PlanoRetirada(BaseModel):
+    id_plano: UUID = Field(alias="idPlano")
+    value: float = Field(alias="valorResgate")
+
+
 class PlanoResponse(BaseModel):
     id: UUID
 
     class Config:
         from_attributes = True
-        populate_by_name = True
+
+
+class PlanoOperationResponse(BaseModel):
+    id: UUID
+
+    class Config:
+        from_attributes = True

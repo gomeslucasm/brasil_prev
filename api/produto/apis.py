@@ -12,8 +12,5 @@ produto_router = APIRouter()
 def register_produto(produto: ProdutoCreate, db: Session = Depends(get_db)):
     produto_repository = ProdutoDatabaseRepository(db)
     produto_service = ProdutoService(produto_repository)
-    try:
-        new_produto = produto_service.create_produto(produto)
-        return new_produto
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    new_produto = produto_service.create_produto(produto)
+    return new_produto

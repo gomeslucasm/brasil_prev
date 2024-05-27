@@ -1,7 +1,8 @@
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from api.common.bases.repository import BaseDatabaseRepository
-from api.plano.models import Plano, ProdutoPlano
-from api.plano.entities import ProdutoData
+from api.plano.models import Plano, ProdutoPlano, PlanoOperation
+from api.plano.entities import PlanoData, ProdutoData
 from typing import Optional, Protocol
 from uuid import UUID
 from datetime import datetime
@@ -18,10 +19,59 @@ class IPlanoRepository(Protocol):
         idade_de_aposentadoria: int,
     ) -> Plano: ...
 
+    def aporte_extra(self, *, id_plano: UUID, value: float) -> Plano: ...
+
+    def get_plano_data(self, *, id_plano: UUID) -> Optional[PlanoData]: ...
+
+    def retirada(self, *, id_plano: UUID, value: float) -> PlanoOperation: ...
+
+    def get_last_retirada(self, *, id_plano: UUID) -> Optional[PlanoOperation]: ...
+
 
 class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
     def __init__(self, db: Session):
         super().__init__(db)
+
+    def get_plano_data(self, *, id_plano: UUID) -> Optional[PlanoData]:
+        plano_data = (
+            self.db.query(
+                Plano.id.label("id"),
+                Plano.id_cliente.label("id_cliente"),
+                Plano.aporte.label("aporte"),
+                Plano.data_da_contratacao.label("data_da_contratacao"),
+                Plano.idade_de_aposentadoria.label("idade_de_aposentadoria"),
+                Plano.created_on.label("created_on"),
+                ProdutoPlano.nome.label("produto_nome"),
+                ProdutoPlano.susep.label("produto_susep"),
+                ProdutoPlano.expiracao_de_venda.label("produto_expiracao_de_venda"),
+                ProdutoPlano.valor_minimo_aporte_inicial.label(
+                    "produto_valor_minimo_aporte_inicial"
+                ),
+                ProdutoPlano.valor_minimo_aporte_extra.label(
+                    "produto_valor_minimo_aporte_extra"
+                ),
+                ProdutoPlano.idade_de_entrada.label("produto_idade_de_entrada"),
+                ProdutoPlano.idade_de_saida.label("produto_idade_de_saida"),
+                ProdutoPlano.carencia_inicial_de_resgate.label(
+                    "produto_carencia_inicial_de_resgate"
+                ),
+                ProdutoPlano.carencia_entre_resgates.label(
+                    "produto_carencia_entre_resgates"
+                ),
+            )
+            .join(
+                ProdutoPlano,
+                and_(
+                    ProdutoPlano.deleted_on.is_(None),
+                    ProdutoPlano.id == Plano.id_produto_plano,
+                ),
+            )
+            .filter(
+                and_(Plano.deleted_on.is_(None), Plano.id == id_plano),
+            )
+        ).first()
+
+        return plano_data
 
     def create(
         self,
@@ -59,4 +109,52 @@ class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
         self.commit()
         self.refresh(plano)
 
+        operation = PlanoOperation(
+            id_plano=plano.id,
+            operation_type="contratacao",
+            value=aporte,
+        )
+        self.add(operation)
+        self.commit()
+        self.refresh(operation)
+
         return plano
+
+    def aporte_extra(self, *, id_plano: UUID, value: float) -> PlanoOperation:
+        operation = PlanoOperation(
+            id_plano=id_plano,
+            operation_type="aporte",
+            value=value,
+        )
+        self.db.query(Plano).filter(Plano.id == id_plano).update(
+            {Plano.aporte: Plano.aporte + value}, synchronize_session="fetch"
+        )
+
+        self.add(operation)
+        self.commit()
+        return operation
+
+    def retirada(self, *, id_plano: UUID, value: float) -> PlanoOperation:
+        operation = PlanoOperation(
+            id_plano=id_plano,
+            operation_type="retirada",
+            value=value,
+        )
+        self.db.query(Plano).filter(Plano.id == id_plano).update(
+            {Plano.aporte: Plano.aporte - value}, synchronize_session="fetch"
+        )
+
+        self.add(operation)
+        self.commit()
+        return operation
+
+    def get_last_retirada(self, *, id_plano: UUID) -> Optional[PlanoOperation]:
+        return (
+            self.db.query(PlanoOperation)
+            .filter(
+                PlanoOperation.id_plano == id_plano,
+                PlanoOperation.deleted_on.isnot(True),
+                PlanoOperation.operation_type == "retirada",
+            )
+            .order_by(PlanoOperation.created_on.desc())
+        ).first()

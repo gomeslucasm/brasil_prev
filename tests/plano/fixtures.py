@@ -1,22 +1,22 @@
-from typing import Callable, Optional
 import pytest
-from unittest.mock import Mock, patch
+from typing import Callable, Literal, Optional
 from sqlalchemy.orm import Session
-from api.plano.models import Plano, ProdutoPlano
-from api.plano.services import PlanoService, create_plano_service
-from api.plano.repositories import IPlanoRepository
-from datetime import datetime
-from uuid import uuid4
-from tests.fixtures.db import *
 from api.plano.entities import ProdutoData
+from api.plano.models import Plano, ProdutoPlano, PlanoOperation
+from datetime import datetime, timedelta
+from uuid import UUID, uuid4
+from api.plano.repositories import IPlanoRepository
+from tests.fixtures.db import db
+from api.produto.models import Produto
+from tests.produto.fixtures import *
 
 
 @pytest.fixture
 def create_plano():
     def fn(
         *,
-        id_cliente: str,
-        id_produto_plano: str,
+        id_cliente: UUID,
+        id_produto_plano: UUID,
         aporte: float,
         data_da_contratacao: datetime,
         idade_de_aposentadoria: int,
@@ -33,20 +33,47 @@ def create_plano():
 
 
 @pytest.fixture
+def create_produto_plano():
+    def fn(
+        *,
+        produto: Produto,
+    ) -> ProdutoPlano:
+        return ProdutoPlano(
+            id_produto=produto.id,
+            nome=produto.nome,
+            susep=produto.susep,
+            expiracao_de_venda=produto.expiracao_de_venda,
+            valor_minimo_aporte_inicial=produto.valor_minimo_aporte_inicial,
+            valor_minimo_aporte_extra=produto.valor_minimo_aporte_extra,
+            idade_de_entrada=produto.idade_de_entrada,
+            idade_de_saida=produto.idade_de_saida,
+            carencia_inicial_de_resgate=produto.carencia_inicial_de_resgate,
+            carencia_entre_resgates=produto.carencia_entre_resgates,
+        )
+
+    return fn
+
+
+@pytest.fixture
 def create_plano_on_db(
-    db: Session, create_plano: Callable[..., Plano]
+    db: Session, create_plano, create_produto_plano
 ) -> Callable[..., Plano]:
     def fn(
         *,
-        id_cliente: str,
-        id_produto_plano: str,
+        id_cliente: UUID,
+        produto: Produto,
         aporte: float,
         data_da_contratacao: datetime,
         idade_de_aposentadoria: int,
     ) -> Plano:
+        produto_plano = create_produto_plano(produto=produto)
+        db.add(produto_plano)
+        db.commit()
+        db.refresh(produto_plano)
+
         plano = create_plano(
             id_cliente=id_cliente,
-            id_produto_plano=id_produto_plano,
+            id_produto_plano=produto_plano.id,
             aporte=aporte,
             data_da_contratacao=data_da_contratacao,
             idade_de_aposentadoria=idade_de_aposentadoria,
@@ -60,52 +87,39 @@ def create_plano_on_db(
 
 
 @pytest.fixture
-def new_plano(db: Session, create_plano_on_db, delete_entity_on_db):
-    produto_plano = ProdutoPlano(
-        id_produto=uuid4(),
-        nome="Produto Teste",
-        susep="123456",
-        expiracao_de_venda=datetime(year=2023, month=1, day=1),
-        valor_minimo_aporte_inicial=1000.0,
-        valor_minimo_aporte_extra=100.0,
-        idade_de_entrada=18,
-        idade_de_saida=65,
-        carencia_inicial_de_resgate=30,
-        carencia_entre_resgates=10,
-    )
+def create_plano_operation():
+    def fn(
+        *,
+        id_plano: UUID,
+        value: float,
+        operation_type: Literal["contratacao", "aporte", "retirada"],
+    ) -> PlanoOperation:
+        operation = PlanoOperation(
+            id_plano=id_plano,
+            operation_type=operation_type,
+            value=value,
+        )
+        return operation
 
-    db.add(produto_plano)
-    db.commit()
-    db.refresh(produto_plano)
-
-    plano = create_plano_on_db(
-        id_cliente=uuid4(),
-        id_produto_plano=produto_plano.id,
-        aporte=2000.0,
-        data_da_contratacao=datetime(year=2022, month=4, day=5),
-        idade_de_aposentadoria=60,
-    )
-
-    yield plano
-
-    delete_entity_on_db(plano)
-    delete_entity_on_db(produto_plano)
+    return fn
 
 
 @pytest.fixture
-def get_plano_on_db(db: Session) -> Callable[..., Optional[Plano]]:
+def create_plano_operation_on_db(create_plano_operation, db):
     def fn(
         *,
-        id: Optional[int] = None,
-    ) -> Optional[Plano]:
-        query = db.query(Plano)
-
-        if id:
-            query = query.filter(Plano.id == id)
-        else:
-            raise Exception("Need id")
-
-        return query.first()
+        id_plano: UUID,
+        value: float,
+        operation_type: Literal["contratacao", "aporte", "retirada"],
+    ) -> PlanoOperation:
+        plano_operation = create_plano_operation(
+            id_plano=id_plano,
+            operation_type=operation_type,
+            value=value,
+        )
+        db.add(plano_operation)
+        db.commit()
+        return plano_operation
 
     return fn
 
@@ -117,18 +131,31 @@ def mock_plano_repository():
 
 
 @pytest.fixture
-def plano_service(
-    mock_plano_repository, mock_produto_repository, mock_cliente_repository
-):
-    return PlanoService(
-        plano_repository=mock_plano_repository,
-        produto_repository=mock_produto_repository,
-        cliente_repository=mock_cliente_repository,
-    )
+def mock_plano_service():
+    with patch("api.plano.services.PlanoService") as mock:
+        mock_service = mock.return_value
+        yield mock_service
 
 
 @pytest.fixture
-def mock_plano_service():
-    with patch("api.plano.apis.create_plano_service") as mock:
-        mock_service = mock.return_value
-        yield mock_service
+def create_plano_operation_on_db(db):
+    def fn(
+        *,
+        value: float,
+        operation_type: Literal["contratacao", "retirada", "aporte"],
+        id_plano: UUID,
+        created_on: Optional[datetime] = None,
+    ):
+        operation = PlanoOperation(
+            id_plano=id_plano, operation_type=operation_type, value=value
+        )
+        db.add(operation)
+        db.commit()
+
+        if created_on:
+            operation.created_on = created_on
+            db.commit()
+
+        return operation
+
+    return fn

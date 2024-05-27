@@ -1,4 +1,5 @@
 from api.cliente.schemas import ClientCreate
+from api.common.errors import ValidationError
 from tests.cliente.fixtures import *
 from datetime import datetime
 
@@ -67,6 +68,6 @@ def test_create_client_error_on_existent_cpf(
     mock_client_repository.create.return_value = client_data
 
     with pytest.raises(
-        Exception, match=f"Client with this CPF={client.cpf} already exists"
+        ValidationError, match=f"Client with this CPF={client.cpf} already exists"
     ):
         client_service.create_client(client_data)
