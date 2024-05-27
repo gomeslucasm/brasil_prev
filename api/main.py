@@ -33,7 +33,7 @@ def register_error_handlers(app):
             return JSONResponse(content=dict(message=str(exc)), status_code=400)
 
         return JSONResponse(
-            content=dict(message="Internal server error = "), status_code=500
+            content=dict(message="Internal server error"), status_code=500
         )
 
 
