@@ -16,7 +16,7 @@ class PlanoAporteExtra(BaseModel):
     value: float = Field(alias="valorAporte")
 
 
-class PlanoRetirada(BaseModel):
+class Planoresgate(BaseModel):
     id_plano: UUID = Field(alias="idPlano")
     value: float = Field(alias="valorResgate")
 

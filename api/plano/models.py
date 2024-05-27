@@ -48,7 +48,7 @@ class PlanoOperation(BaseDBModel):
     )
     operation_type = mapped_column(
         String, nullable=False
-    )  # "aporte", "retirada", "contratacao"
+    )  # "aporte", "resgate", "contratacao"
     value = mapped_column(Float, nullable=False)
 
     plano = relationship("Plano", backref="operations")

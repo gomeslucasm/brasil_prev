@@ -2,7 +2,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from api.common.bases.repository import BaseDatabaseRepository
 from api.plano.models import Plano, ProdutoPlano, PlanoOperation
-from api.plano.entities import PlanoData, ProdutoData
+from api.plano.types import OperationType, PlanoData, ProdutoData
 from typing import Optional, Protocol
 from uuid import UUID
 from datetime import datetime
@@ -28,10 +28,10 @@ class IPlanoRepository(ABC):
     def get_plano_data(self, *, id_plano: UUID) -> Optional[PlanoData]: ...
 
     @abstractmethod
-    def retirada(self, *, id_plano: UUID, value: float) -> PlanoOperation: ...
+    def resgate(self, *, id_plano: UUID, value: float) -> PlanoOperation: ...
 
     @abstractmethod
-    def get_last_retirada(self, *, id_plano: UUID) -> Optional[PlanoOperation]: ...
+    def get_last_resgate(self, *, id_plano: UUID) -> Optional[PlanoOperation]: ...
 
 
 class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
@@ -117,7 +117,7 @@ class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
 
         operation = PlanoOperation(
             id_plano=plano.id,
-            operation_type="contratacao",
+            operation_type=OperationType.CONTRATACAO,
             value=aporte,
         )
         self.add(operation)
@@ -129,7 +129,7 @@ class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
     def aporte_extra(self, *, id_plano: UUID, value: float) -> PlanoOperation:
         operation = PlanoOperation(
             id_plano=id_plano,
-            operation_type="aporte",
+            operation_type=OperationType.APORTE,
             value=value,
         )
         self.db.query(Plano).filter(Plano.id == id_plano).update(
@@ -140,10 +140,10 @@ class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
         self.commit()
         return operation
 
-    def retirada(self, *, id_plano: UUID, value: float) -> PlanoOperation:
+    def resgate(self, *, id_plano: UUID, value: float) -> PlanoOperation:
         operation = PlanoOperation(
             id_plano=id_plano,
-            operation_type="retirada",
+            operation_type=OperationType.RESGATE,
             value=value,
         )
         self.db.query(Plano).filter(Plano.id == id_plano).update(
@@ -154,13 +154,13 @@ class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
         self.commit()
         return operation
 
-    def get_last_retirada(self, *, id_plano: UUID) -> Optional[PlanoOperation]:
+    def get_last_resgate(self, *, id_plano: UUID) -> Optional[PlanoOperation]:
         return (
             self.db.query(PlanoOperation)
             .filter(
                 PlanoOperation.id_plano == id_plano,
                 PlanoOperation.deleted_on.isnot(True),
-                PlanoOperation.operation_type == "retirada",
+                PlanoOperation.operation_type == OperationType.RESGATE,
             )
             .order_by(PlanoOperation.created_on.desc())
         ).first()

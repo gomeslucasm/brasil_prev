@@ -5,7 +5,7 @@ from api.plano.schemas import (
     PlanoCreate,
     PlanoOperationResponse,
     PlanoResponse,
-    PlanoRetirada,
+    Planoresgate,
 )
 from api.plano.services import create_plano_service
 from api.infra.db import get_db
@@ -37,13 +37,13 @@ def aporte_extra_plano(
     return plano_service.aporte_extra(plano_aporte_extra)
 
 
-@plano_router.post("/planos/retirada", response_model=PlanoOperationResponse)
-def retirada_plano(plano_retirada: PlanoRetirada, db: Session = Depends(get_db)):
+@plano_router.post("/planos/resgate", response_model=PlanoOperationResponse)
+def resgate_plano(plano_resgate: Planoresgate, db: Session = Depends(get_db)):
     """
     Resgate
     """
     plano_service = create_plano_service(db)
-    plano_service.validate_retirada(
-        id_plano=plano_retirada.id_plano, value=plano_retirada.value
+    plano_service.validate_resgate(
+        id_plano=plano_resgate.id_plano, value=plano_resgate.value
     )
-    return plano_service.retirada(plano_retirada)
+    return plano_service.resgate(plano_resgate)

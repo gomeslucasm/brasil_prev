@@ -8,11 +8,11 @@ from api.common.utils import adjust_datetime_to_utc
 from api.plano.repositories import IPlanoRepository, PlanoDatabaseRepository
 from api.produto.repositories import IProdutoRepository, ProdutoDatabaseRepository
 from api.cliente.repositories import ClientDatabaseRepository, IClientRepository
-from api.plano.schemas import PlanoAporteExtra, PlanoCreate, PlanoRetirada
+from api.plano.schemas import PlanoAporteExtra, PlanoCreate, Planoresgate
 from api.plano.models import Plano, PlanoOperation
 from api.produto.models import Produto
 from api.cliente.models import Client
-from api.plano.entities import ProdutoData, PlanoData
+from api.plano.types import ProdutoData, PlanoData
 
 
 class PlanoService:
@@ -110,17 +110,17 @@ class PlanoService:
     def __carencia_entre_resgates_is_valid(
         self, *, id_plano: UUID, plano_data: PlanoData
     ):
-        last_retirada = self.plano_repository.get_last_retirada(id_plano=id_plano)
+        last_resgate = self.plano_repository.get_last_resgate(id_plano=id_plano)
 
-        if not last_retirada:
+        if not last_resgate:
             return True
 
         return (
-            adjust_datetime_to_utc(last_retirada.created_on)
+            adjust_datetime_to_utc(last_resgate.created_on)
             + timedelta(days=plano_data.produto_carencia_entre_resgates)
         ) < adjust_datetime_to_utc(datetime.now())
 
-    def validate_retirada(self, *, id_plano: UUID, value: float) -> bool:
+    def validate_resgate(self, *, id_plano: UUID, value: float) -> bool:
         plano_data = self.get_plano_data(id_plano=id_plano)
 
         if plano_data.aporte < value:
@@ -145,9 +145,9 @@ class PlanoService:
             id_plano=plano_aporte_extra.id_plano, value=plano_aporte_extra.value
         )
 
-    def retirada(self, plano_retirada: PlanoRetirada):
-        return self.plano_repository.retirada(
-            id_plano=plano_retirada.id_plano, value=plano_retirada.value
+    def resgate(self, plano_resgate: Planoresgate):
+        return self.plano_repository.resgate(
+            id_plano=plano_resgate.id_plano, value=plano_resgate.value
         )
 
 

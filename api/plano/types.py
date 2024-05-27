@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum
+from typing import Literal
 from uuid import UUID
 
 
@@ -34,3 +36,9 @@ class PlanoData:
     produto_idade_de_saida: int
     produto_carencia_inicial_de_resgate: int
     produto_carencia_entre_resgates: int
+
+
+class OperationType(StrEnum):
+    CONTRATACAO = "contratacao"
+    RESGATE = "resgate"
+    APORTE = "aporte"

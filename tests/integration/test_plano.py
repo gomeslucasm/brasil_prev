@@ -75,7 +75,7 @@ def test_aporte_extra_success(api_client):
     assert "id" in response.json()
 
 
-def test_retirada_success(api_client):
+def test_resgate_success(api_client):
     client_id = create_client(api_client, "989.644.750-03")
     product_id = create_product(api_client)
 
@@ -90,10 +90,10 @@ def test_retirada_success(api_client):
     assert response.status_code == 200
     plano_id = response.json()["id"]
 
-    retirada_data = {
+    resgate_data = {
         "idPlano": plano_id,
         "valorResgate": 1000.0,
     }
-    response = api_client.post("/api/planos/retirada", json=retirada_data)
+    response = api_client.post("/api/planos/resgate", json=resgate_data)
     assert response.status_code == 200
     assert "id" in response.json()

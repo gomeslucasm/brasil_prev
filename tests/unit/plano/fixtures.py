@@ -1,7 +1,7 @@
 import pytest
 from typing import Callable, Literal, Optional
 from sqlalchemy.orm import Session
-from api.plano.entities import ProdutoData
+from api.plano.types import OperationType, ProdutoData
 from api.plano.models import Plano, ProdutoPlano, PlanoOperation
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
@@ -92,7 +92,7 @@ def create_plano_operation():
         *,
         id_plano: UUID,
         value: float,
-        operation_type: Literal["contratacao", "aporte", "retirada"],
+        operation_type: OperationType,
     ) -> PlanoOperation:
         operation = PlanoOperation(
             id_plano=id_plano,
@@ -110,7 +110,7 @@ def create_plano_operation_on_db(create_plano_operation, db):
         *,
         id_plano: UUID,
         value: float,
-        operation_type: Literal["contratacao", "aporte", "retirada"],
+        operation_type: OperationType,
     ) -> PlanoOperation:
         plano_operation = create_plano_operation(
             id_plano=id_plano,
@@ -142,7 +142,7 @@ def create_plano_operation_on_db(db):
     def fn(
         *,
         value: float,
-        operation_type: Literal["contratacao", "retirada", "aporte"],
+        operation_type: OperationType,
         id_plano: UUID,
         created_on: Optional[datetime] = None,
     ):

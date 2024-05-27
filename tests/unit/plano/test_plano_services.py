@@ -1,11 +1,11 @@
 import pytest
 from datetime import datetime, timedelta
 from api.common.errors import NotFoundError, ValidationError
-from api.plano.schemas import PlanoAporteExtra, PlanoCreate, PlanoRetirada
+from api.plano.schemas import PlanoAporteExtra, PlanoCreate, Planoresgate
 from api.plano.services import PlanoService
 from unittest.mock import Mock
 from uuid import uuid4
-from api.plano.entities import ProdutoData
+from api.plano.types import ProdutoData
 from tests.unit.plano.fixtures import *
 from tests.unit.produto.fixtures import *
 from tests.unit.cliente.fixtures import *
@@ -204,7 +204,7 @@ def test_aporte_extra():
     )
 
 
-def test_validate_retirada():
+def test_validate_resgate():
     mock_plano_repository = Mock(spec=IPlanoRepository)
     mock_produto_repository = Mock()
     mock_cliente_repository = Mock()
@@ -222,7 +222,7 @@ def test_validate_retirada():
     with pytest.raises(
         ValidationError, match="O valor de aporte é menor que o de resgate"
     ):
-        plano_service.validate_retirada(id_plano=id_plano, value=1500)
+        plano_service.validate_resgate(id_plano=id_plano, value=1500)
 
     plano_data = Mock(
         id=id_plano,
@@ -237,7 +237,7 @@ def test_validate_retirada():
         ValidationError,
         match=f"Ainda não é possível fazer resgatas devido ao tempo de carencia inicial de {plano_data.produto_carencia_inicial_de_resgate}",
     ):
-        plano_service.validate_retirada(id_plano=id_plano, value=1000)
+        plano_service.validate_resgate(id_plano=id_plano, value=1000)
 
     plano_data = Mock(
         id=id_plano,
@@ -248,7 +248,7 @@ def test_validate_retirada():
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
-    mock_plano_repository.get_last_retirada.return_value = Mock(
+    mock_plano_repository.get_last_resgate.return_value = Mock(
         created_on=datetime.now()
         + timedelta(days=plano_data.produto_carencia_entre_resgates - 1),
     )
@@ -257,7 +257,7 @@ def test_validate_retirada():
         ValidationError,
         match=f"Não é possível fazer o resgate por que o último resgate foi feito a menos de {plano_data.produto_carencia_entre_resgates} dias",
     ):
-        plano_service.validate_retirada(id_plano=id_plano, value=1000)
+        plano_service.validate_resgate(id_plano=id_plano, value=1000)
 
     plano_data = Mock(
         id=id_plano,
@@ -268,9 +268,9 @@ def test_validate_retirada():
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
-    mock_plano_repository.get_last_retirada.return_value = None
+    mock_plano_repository.get_last_resgate.return_value = None
 
-    assert plano_service.validate_retirada(id_plano=id_plano, value=1000)
+    assert plano_service.validate_resgate(id_plano=id_plano, value=1000)
 
     plano_data = Mock(
         id=id_plano,
@@ -281,15 +281,15 @@ def test_validate_retirada():
     )
 
     mock_plano_repository.get_plano_data.return_value = plano_data
-    mock_plano_repository.get_last_retirada.return_value = Mock(
+    mock_plano_repository.get_last_resgate.return_value = Mock(
         created_on=plano_data.data_da_contratacao
         + timedelta(days=plano_data.produto_carencia_entre_resgates + 1)
     )
 
-    assert plano_service.validate_retirada(id_plano=id_plano, value=1000)
+    assert plano_service.validate_resgate(id_plano=id_plano, value=1000)
 
 
-def test_retirada():
+def test_resgate():
     mock_plano_repository = Mock(spec=IPlanoRepository)
     mock_produto_repository = Mock()
     mock_cliente_repository = Mock()
@@ -302,9 +302,9 @@ def test_retirada():
         mock_plano_repository, mock_produto_repository, mock_cliente_repository
     )
 
-    aporte_extra = PlanoRetirada(idPlano=uuid4(), valorResgate=1000)
+    aporte_extra = Planoresgate(idPlano=uuid4(), valorResgate=1000)
 
-    plano_service.retirada(aporte_extra)
-    mock_plano_repository.retirada.assert_called_once_with(
+    plano_service.resgate(aporte_extra)
+    mock_plano_repository.resgate.assert_called_once_with(
         id_plano=aporte_extra.id_plano, value=aporte_extra.value
     )

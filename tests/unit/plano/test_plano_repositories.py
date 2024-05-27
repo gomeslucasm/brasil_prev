@@ -3,7 +3,7 @@ from uuid import uuid4
 from sqlalchemy.orm import Session
 from api.plano.models import Plano, ProdutoPlano, PlanoOperation
 from api.plano.repositories import PlanoDatabaseRepository
-from api.plano.entities import ProdutoData
+from api.plano.types import ProdutoData
 from tests.fixtures.db import db
 from tests.unit.plano.fixtures import *
 from tests.unit.cliente.fixtures import *
@@ -43,7 +43,7 @@ def test_create_plano(db: Session, new_client, new_produto):
         db.query(PlanoOperation).filter(PlanoOperation.id_plano == plano.id).all()
     )
     assert len(operations) == 1
-    assert operations[0].operation_type == "contratacao"
+    assert operations[0].operation_type == OperationType.CONTRATACAO
     assert operations[0].value == 2000.0
 
 
@@ -78,14 +78,14 @@ def test_aporte_extra(
 
     assert operation.id is not None
     assert operation.value == valor_aporte
-    assert operation.operation_type == "aporte"
+    assert operation.operation_type == OperationType.APORTE
 
     updated_plano = get_plano_by_id(id_plano=plano.id)
     assert updated_plano
     assert updated_plano.aporte == aporte_inicial + valor_aporte
 
 
-def test_retirada(
+def test_resgate(
     db: Session, create_plano_on_db, create_produto_on_db, get_plano_by_id
 ):
     produto = create_produto_on_db(
@@ -111,18 +111,18 @@ def test_retirada(
     )
 
     repository = PlanoDatabaseRepository(db)
-    valor_retirada = 1000.0
+    valor_resgate = 1000.0
 
-    operation = repository.retirada(id_plano=plano.id, value=valor_retirada)
+    operation = repository.resgate(id_plano=plano.id, value=valor_resgate)
 
     assert operation.id is not None
-    assert operation.value == valor_retirada
-    assert operation.operation_type == "retirada"
+    assert operation.value == valor_resgate
+    assert operation.operation_type == OperationType.RESGATE
 
     updated_plano = get_plano_by_id(id_plano=plano.id)
 
     assert updated_plano
-    assert updated_plano.aporte == aporte_inicial - valor_retirada
+    assert updated_plano.aporte == aporte_inicial - valor_resgate
 
 
 def test_get_plano_data(db: Session, create_plano_on_db, create_produto_on_db):
@@ -158,7 +158,7 @@ def test_get_plano_data(db: Session, create_plano_on_db, create_produto_on_db):
     )
 
 
-def test_get_last_retirada(
+def test_get_last_resgate(
     db: Session, create_plano_on_db, create_produto_on_db, create_plano_operation_on_db
 ):
     produto = create_produto_on_db(
@@ -182,31 +182,33 @@ def test_get_last_retirada(
     )
 
     repository = PlanoDatabaseRepository(db)
-    last_retirada = repository.get_last_retirada(id_plano=plano.id)
+    last_resgate = repository.get_last_resgate(id_plano=plano.id)
 
-    assert not last_retirada
+    assert not last_resgate
 
-    create_plano_operation_on_db(id_plano=plano.id, value=100, operation_type="aporte")
+    create_plano_operation_on_db(
+        id_plano=plano.id, value=100, operation_type=OperationType.APORTE
+    )
 
-    last_retirada = repository.get_last_retirada(id_plano=plano.id)
+    last_resgate = repository.get_last_resgate(id_plano=plano.id)
 
-    assert not last_retirada
+    assert not last_resgate
 
     create_plano_operation_on_db(
         id_plano=plano.id,
         value=100,
-        operation_type="retirada",
+        operation_type=OperationType.RESGATE,
         created_on=datetime.now() + timedelta(days=1),
     )
 
-    correct_last_retirada = create_plano_operation_on_db(
+    correct_last_resgate = create_plano_operation_on_db(
         id_plano=plano.id,
         value=100,
-        operation_type="retirada",
+        operation_type=OperationType.RESGATE,
         created_on=datetime.now() + timedelta(days=2),
     )
 
-    last_retirada = repository.get_last_retirada(id_plano=plano.id)
+    last_resgate = repository.get_last_resgate(id_plano=plano.id)
 
-    assert last_retirada
-    assert correct_last_retirada.id == last_retirada.id
+    assert last_resgate
+    assert correct_last_resgate.id == last_resgate.id

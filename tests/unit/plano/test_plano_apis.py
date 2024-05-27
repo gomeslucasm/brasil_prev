@@ -1,7 +1,7 @@
 from uuid import uuid4
 from api.plano.models import Plano
 from tests.fixtures.api import *
-from api.plano.schemas import PlanoAporteExtra, PlanoCreate, PlanoRetirada
+from api.plano.schemas import PlanoAporteExtra, PlanoCreate, Planoresgate
 from tests.unit.plano.fixtures import *
 from datetime import datetime
 
@@ -98,42 +98,42 @@ def test_aporte_extra_api_invalid_data(api_client, mock_plano_service):
     assert response.status_code == 422
 
 
-def test_retirada_api(api_client, mock_plano_service):
+def test_resgate_api(api_client, mock_plano_service):
     id_plano = uuid4()
     aporte_extra = {"idPlano": str(id_plano), "valorResgate": 1000}
 
-    plano_retirada_mock = PlanoRetirada(
+    plano_resgate_mock = Planoresgate(
         idPlano=id_plano,
         valorResgate=1000,
     )
 
     id_operation = uuid4()
 
-    mock_plano_service.validate_retirada.return_value = True
-    mock_plano_service.retirada.return_value = Mock(id=id_operation)
+    mock_plano_service.validate_resgate.return_value = True
+    mock_plano_service.resgate.return_value = Mock(id=id_operation)
 
-    response = api_client.post("/api/planos/retirada", json=aporte_extra)
+    response = api_client.post("/api/planos/resgate", json=aporte_extra)
 
-    mock_plano_service.validate_retirada.assert_called_once_with(
-        id_plano=plano_retirada_mock.id_plano, value=plano_retirada_mock.value
+    mock_plano_service.validate_resgate.assert_called_once_with(
+        id_plano=plano_resgate_mock.id_plano, value=plano_resgate_mock.value
     )
 
-    mock_plano_service.retirada.assert_called_once_with(plano_retirada_mock)
+    mock_plano_service.resgate.assert_called_once_with(plano_resgate_mock)
 
     assert response.json()["id"] == str(id_operation)
     assert response.status_code == 200
 
 
-def test_retirada_api_invalid_data(api_client):
+def test_resgate_api_invalid_data(api_client):
     id_plano = uuid4()
     aporte_extra = {"idPlano": str(id_plano), "valorResgate": "invalid"}
 
-    response = api_client.post("/api/planos/retirada", json=aporte_extra)
+    response = api_client.post("/api/planos/resgate", json=aporte_extra)
 
     assert response.status_code == 422
 
     aporte_extra = {"idPlano": "invalid", "valorResgate": 1000}
 
-    response = api_client.post("/api/planos/retirada", json=aporte_extra)
+    response = api_client.post("/api/planos/resgate", json=aporte_extra)
 
     assert response.status_code == 422
