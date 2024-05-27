@@ -4,13 +4,15 @@ from sqlalchemy.orm import Session
 from api.common.bases.repository import BaseDatabaseRepository
 from api.produto.models import Produto
 from datetime import datetime
-from typing import Protocol
 from api.produto.models import Produto
+from abc import ABC, abstractmethod
 
 
-class IProdutoRepository(Protocol):
+class IProdutoRepository(ABC):
+    @abstractmethod
     def get_by_id(self, id: str | UUID) -> Optional[Produto]: ...
 
+    @abstractmethod
     def create(
         self,
         *,

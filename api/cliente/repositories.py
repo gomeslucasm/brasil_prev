@@ -4,15 +4,17 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from api.common.bases.repository import BaseDatabaseRepository
 from api.cliente.models import Client
+from abc import ABC, abstractmethod
 
 
-class IClientRepository(Protocol):
-    def __init__(self, db: Session): ...
-
+class IClientRepository(ABC):
+    @abstractmethod
     def get_by_id(self, id: str | UUID) -> Optional[Client]: ...
 
+    @abstractmethod
     def get_by_cpf(self, cpf: str) -> Optional[Client]: ...
 
+    @abstractmethod
     def create(
         self,
         *,

@@ -6,9 +6,11 @@ from api.plano.entities import PlanoData, ProdutoData
 from typing import Optional, Protocol
 from uuid import UUID
 from datetime import datetime
+from abc import ABC, abstractmethod
 
 
-class IPlanoRepository(Protocol):
+class IPlanoRepository(ABC):
+    @abstractmethod
     def create(
         self,
         *,
@@ -19,12 +21,16 @@ class IPlanoRepository(Protocol):
         idade_de_aposentadoria: int,
     ) -> Plano: ...
 
+    @abstractmethod
     def aporte_extra(self, *, id_plano: UUID, value: float) -> Plano: ...
 
+    @abstractmethod
     def get_plano_data(self, *, id_plano: UUID) -> Optional[PlanoData]: ...
 
+    @abstractmethod
     def retirada(self, *, id_plano: UUID, value: float) -> PlanoOperation: ...
 
+    @abstractmethod
     def get_last_retirada(self, *, id_plano: UUID) -> Optional[PlanoOperation]: ...
 
 
