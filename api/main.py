@@ -9,6 +9,8 @@ from api.produto.apis import produto_router
 from api.plano.apis import plano_router
 from sqlalchemy.sql import text
 
+app = FastAPI()
+
 
 def register_apis(app):
     app.include_router(client_router, prefix="/api")
@@ -35,15 +37,6 @@ def register_error_handlers(app):
         )
 
 
-def create_app():
-
-    __app = FastAPI()
-
-    register_models()
-    register_error_handlers(__app)
-    register_apis(__app)
-
-    return __app
-
-
-app = create_app()
+register_models()
+register_error_handlers(app)
+register_apis(app)

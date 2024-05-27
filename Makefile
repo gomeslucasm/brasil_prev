@@ -2,20 +2,20 @@ build:
 	docker-compose build --no-cache
 
 run:
-	docker-compose up
+	docker-compose up -d
 
 .PHONY: migrate
 db-upgrade:
-	docker-compose run --rm web poetry run alembic upgrade head
+	docker-compose exec -it web poetry run alembic upgrade head
 
 .PHONY: migrate
 db-downgrade:
-	docker-compose run --rm web poetry run alembic downgrade -1
+	docker-compose exec -it web poetry run alembic downgrade -1
 
 .PHONY: makemigrations
 db-makemigrations:
 	@read -p "Enter migration message: " msg; \
-	docker-compose run --rm web poetry run alembic revision --autogenerate -m "$${msg}"
+	docker-compose exec -it web poetry run alembic revision --autogenerate -m "$${msg}"
 
 .PHONY: down
 down:
@@ -27,4 +27,4 @@ test:
 
 .PHONY: test-coverage
 test-coverage:
-	docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html $(test_path)
+	docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html

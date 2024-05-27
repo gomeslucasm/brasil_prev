@@ -10,17 +10,18 @@ services:
     volumes:
       - ./api:/app/api
       - ./tests:/app/tests
-      - ./alembic:/app/alembic
       - ./htmlcov:/app/htmlcov
+      - ./.coveragerc:/app/.coveragerc
     restart: always
     depends_on:
       - db
     environment:
-      DB_USER: myuser
-      DB_PASSWORD: mypassword
-      DB_NAME: mydatabase
-      DB_HOST: db
       DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+      DB_HOST: db
+
     command:
       [
         "poetry",
@@ -35,11 +36,12 @@ services:
       ]
 
   db:
+    restart: always
     image: postgres:latest
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:

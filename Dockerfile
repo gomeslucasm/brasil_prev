@@ -7,14 +7,13 @@ RUN pip install poetry
 
 COPY ./api /app/api
 COPY alembic.ini /app/alembic.ini
-COPY ./alembic /app/alembic
 
 # Development stage
 FROM base as development
 
 COPY ./tests /app/tests
 COPY ./pytest.ini /app
-
+COPY ./.coveragerc /app/.coveragerc
 
 RUN poetry install --with dev
 
