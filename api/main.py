@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
+from starlette.responses import PlainTextResponse
+from api.common.errors import BaseError
 from .infra.db import get_db
 from api.cliente.apis import client_router
 from api.produto.apis import produto_router
@@ -18,8 +20,24 @@ def register_models():
     from api.produto.models import Produto
 
 
+def register_error_handlers(app):
+    @app.exception_handler(Exception)
+    async def handle_default_exception(request, exc):
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        logger.error(request.url, str(exc))
+
+        if isinstance(exc, BaseError):
+            return PlainTextResponse(str(exc), status_code=400)
+
+        return PlainTextResponse("Internal server error", status_code=500)
+
+
 register_models()
 register_apis(app)
+register_error_handlers(app)
 
 
 @app.get("/")
