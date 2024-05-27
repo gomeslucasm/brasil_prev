@@ -20,7 +20,7 @@ Para qualquer dúvida ou problema, entre em contato com:
 ## Informações Gerais
 
     A aplicação roda na porta http://localhost:8000.
-    A documentação da API pode ser acessada em http://localhost/docs.
+    A documentação da API pode ser acessada em http://localhost:8000/docs.
 
 ## Configuração e Execução
 
