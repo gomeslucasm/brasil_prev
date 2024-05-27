@@ -1,5 +1,3 @@
-from typing import Callable
-from api.produto.models import Produto
 from api.produto.repositories import ProdutoDatabaseRepository
 from datetime import datetime
 from tests.produto.fixtures import *
