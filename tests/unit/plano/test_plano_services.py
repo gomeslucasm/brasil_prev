@@ -166,7 +166,7 @@ def test_validate_aporte_extra():
 
     id_plano = uuid4()
 
-    plano_data = Mock(id=id_plano, produto_valor_minimo_aporte_extra=1000)
+    plano_data = Mock(id=id_plano, produto_valor_minimo_aporte_extra=1000, aporte=10)
 
     mock_plano_repository.get_plano_data.return_value = plano_data
 
@@ -174,6 +174,16 @@ def test_validate_aporte_extra():
         ValidationError, match="O valor de aporte extra é menor que o permitido"
     ):
         plano_service.validate_aporte_extra(id_plano=id_plano, value=500)
+
+    mock_plano_repository.get_plano_data.return_value = Mock(id=id_plano, aporte=0)
+
+    with pytest.raises(
+        ValidationError,
+        match=f"Não é possível realizar operações no plano, pois tudo já foi resgatado.",
+    ):
+        plano_service.validate_aporte_extra(id_plano=id_plano, value=1000)
+
+    mock_plano_repository.get_plano_data.return_value = plano_data
 
     assert plano_service.validate_aporte_extra(id_plano=id_plano, value=1000)
     mock_plano_repository.get_plano_data.assert_called_with(id_plano=id_plano)

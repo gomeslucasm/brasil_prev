@@ -5,7 +5,7 @@ from api.produto.services import ProdutoService
 from api.produto.repositories import ProdutoDatabaseRepository
 from api.infra.db import get_db
 
-produto_router = APIRouter()
+produto_router = APIRouter(tags=["Produto"])
 
 
 @produto_router.post("/produtos", response_model=ProdutoResponse)

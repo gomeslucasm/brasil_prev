@@ -5,7 +5,7 @@ from api.cliente.services import ClientService
 from api.cliente.repositories import ClientDatabaseRepository
 from api.infra.db import get_db
 
-client_router = APIRouter()
+client_router = APIRouter(tags=["Cliente"])
 
 
 @client_router.post("/clients", response_model=ClientResponse)

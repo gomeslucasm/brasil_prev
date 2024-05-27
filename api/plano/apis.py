@@ -10,7 +10,7 @@ from api.plano.schemas import (
 from api.plano.services import create_plano_service
 from api.infra.db import get_db
 
-plano_router = APIRouter()
+plano_router = APIRouter(tags=["Plano"])
 
 
 @plano_router.post("/planos", response_model=PlanoResponse)

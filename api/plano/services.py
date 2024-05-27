@@ -95,13 +95,20 @@ class PlanoService:
     def validate_aporte_extra(self, *, id_plano: UUID, value: float) -> bool:
         plano_data = self.get_plano_data(id_plano=id_plano)
 
+        if not self.__is_plano_active(plano_data):
+            raise ValidationError(
+                "Não é possível realizar operações no plano, pois tudo já foi resgatado."
+            )
+
         if value < plano_data.produto_valor_minimo_aporte_extra:
             raise ValidationError("O valor de aporte extra é menor que o permitido")
 
         return True
 
+    def __is_plano_active(self, plano_data: PlanoData):
+        return float(plano_data.aporte) > float(0.0)
+
     def __carencia_inicial_de_resgate_is_valid(self, *, plano_data: PlanoData):
-        print("plano_data.data_da_contratacao = ", plano_data.data_da_contratacao)
         return adjust_datetime_to_utc(datetime.now()) > (
             adjust_datetime_to_utc(plano_data.data_da_contratacao)
             + timedelta(days=plano_data.produto_carencia_inicial_de_resgate)

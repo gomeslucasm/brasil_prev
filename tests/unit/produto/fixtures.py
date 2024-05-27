@@ -100,7 +100,6 @@ def new_produto(create_produto_on_db, delete_entity_on_db):
 def get_plano_by_id(db):
     def fn(*, id_plano: UUID):
         plano = db.query(Plano).filter(Plano.id == id_plano).first()
-        print("plano.id=", plano.id)
 
         return plano
 

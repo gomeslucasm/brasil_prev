@@ -44,7 +44,6 @@ def test_register_produto_api_success(
     mock_produto_service.create_produto.return_value = produto
 
     response = api_client.post("/api/produtos", json=produto_data)
-    print("response.json() = ", response.json())
     assert response.status_code == 200
     assert response.json() == {"id": str(produto.id)}
 
