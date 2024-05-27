@@ -41,4 +41,5 @@ def test_get_client_by_cpf(db, new_client):
 def test_get_client_by_id(db, new_client):
     repository = ClientDatabaseRepository(db)
     client = repository.get_by_id(id=new_client.id)
+    assert client
     assert client.id == new_client.id

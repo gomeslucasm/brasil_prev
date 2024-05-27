@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 from sqlalchemy.orm import Session
 from api.common.bases.repository import BaseDatabaseRepository
 from api.produto.models import Produto
@@ -8,7 +9,7 @@ from api.produto.models import Produto
 
 
 class IProdutoRepository(Protocol):
-    def get_by_id(self, id: int) -> Optional[Produto]: ...
+    def get_by_id(self, id: str | UUID) -> Optional[Produto]: ...
 
     def create(
         self,
@@ -29,7 +30,9 @@ class ProdutoDatabaseRepository(BaseDatabaseRepository[Produto]):
     def __init__(self, db: Session):
         super().__init__(db)
 
-    def get_by_id(self, id: int) -> Optional[Produto]:
+    def get_by_id(self, id: str | UUID) -> Optional[Produto]:
+        if isinstance(id, str):
+            id = UUID(id)
         return self.db.query(Produto).filter(Produto.id == id).first()
 
     def create(
