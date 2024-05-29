@@ -119,8 +119,6 @@ Os teste foram executados utilizando o comando `make test`, para garantir que to
 
 ![Evidência de Cobertura](images/evidencia-coverage.png)
 
-Este relatório mostra que a maioria dos módulos possui alta cobertura de código, indicando que os testes estão abrangendo a maioria das linhas de código. Apenas algumas partes do código estão faltando cobertura, o que pode ser um foco para testes adicionais no futuro.
-
 ## Saída dos relatório de cobertura
 
 Os testes de cobertura foram executados utilizando o comando `make test-coverage`, que executa os testes e gera um relatório de cobertura de código. A imagem abaixo mostra a saída do teste de cobertura:
