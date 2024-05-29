@@ -24,3 +24,16 @@ jobs:
 
       - name: run coverage
         run: docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html
+
+      - name: upload coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: htmlcov/
+
+      - name: deploy to github page
+        if: success()
+        uses: peaceris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./htmlcov
