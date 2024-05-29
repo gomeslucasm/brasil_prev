@@ -33,7 +33,7 @@ jobs:
 
       - name: deploy to github page
         if: success()
-        uses: peaceris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./htmlcov
