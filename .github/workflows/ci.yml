@@ -14,14 +14,14 @@ jobs:
 
 
     steps:
-    -name: checkout code
-     uses: actions/checkout@v2
-    
-    - name: Docker build
-      run: docker-compose build
+      -name: checkout code
+      uses: actions/checkout@v2
+      
+      - name: Docker build
+        run: docker-compose build
 
-    - name: Docker up
-      run: docker-compose up
+      - name: Docker up
+        run: docker-compose up
 
-    - name: run coverage
-      run: docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html
+      - name: run coverage
+        run: docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html
