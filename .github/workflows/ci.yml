@@ -1,8 +1,12 @@
-name: publish-coverage
+name: CI
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   coverage:
@@ -13,14 +17,11 @@ jobs:
     -name: checkout code
      uses: actions/checkout@v2
     
-    -name: Setup docker
-     uses: docker/setup-buildx-action@v1
+    - name: Docker build
+      run: docker-compose build
 
-    - name: build
-      run: make build
-
-    - name: up
-      run: make run
+    - name: Docker up
+      run: docker-compose up
 
     - name: run coverage
-      run: make test-coverage
+      run: docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html
