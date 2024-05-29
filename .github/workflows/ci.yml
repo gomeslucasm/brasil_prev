@@ -20,7 +20,7 @@ jobs:
         run: docker-compose build
 
       - name: Docker up
-        run: docker-compose up
+        run: docker-compose up -d
 
       - name: run coverage
         run: docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missing --cov-report=html
