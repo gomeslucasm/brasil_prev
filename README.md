@@ -102,3 +102,27 @@ docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missin
 ```
 
 O relatório será gerado em em htmlcov/index.html, abra o arquivo no seu navegador.
+
+# Evidências de Testes
+
+Esta seção apresenta as evidências dos testes realizados no projeto. As evidências incluem a saída dos testes e capturas de tela, proporcionando uma visão clara da cobertura e dos resultados dos testes.
+
+O relatório de cobertura é gerado em uma etapa do CI/CD e pode ser acessado em https://gomeslucasm.github.io/brasil_prev/index.html.
+
+## Testes de Cobertura
+
+Os testes foram executados utilizando o pytest com cobertura de código. Abaixo estão as saídas dos testes indicando a cobertura para cada módulo.
+
+### Saída dos Testes
+
+Os teste foram executados utilizando o comando `make test`, para garantir que todos os endpoints implementados estejam funcionando corretamente. A imagem abaixo mostra a saída dos testes:
+
+![Evidência de Cobertura](images/evidencia-coverage.png)
+
+Este relatório mostra que a maioria dos módulos possui alta cobertura de código, indicando que os testes estão abrangendo a maioria das linhas de código. Apenas algumas partes do código estão faltando cobertura, o que pode ser um foco para testes adicionais no futuro.
+
+## Saída dos relatório de cobertura
+
+Os testes de cobertura foram executados utilizando o comando `make test-coverage`, que executa os testes e gera um relatório de cobertura de código. A imagem abaixo mostra a saída do teste de cobertura:
+
+![Evidência dos Testes](images/evidencia_teste.png)
