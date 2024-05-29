@@ -1,0 +1,26 @@
+name: publish-coverage
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+
+    steps:
+    -name: checkout code
+     uses: actions/checkout@v2
+    
+    -name: Setup docker
+     uses: docker/setup-buildx-action@v1
+
+    - name: build
+      run: make build
+
+    - name: up
+      run: make run
+
+    - name: run coverage
+      run: make test-coverage
