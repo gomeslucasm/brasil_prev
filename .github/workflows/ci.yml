@@ -31,17 +31,12 @@ jobs:
           name: coverage-report
           path: htmlcov/
 
-      - name: Move coverage report
-        run: |
-          sudo chmod -R 777 htmlcov
-          mkdir -p coverage-report
-          cp -r htmlcov/* coverage-report/
-
       - name: Deploy to GitHub Pages
         if: success()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GH_TOKEN }}
-          publish_dir: ./coverage-report
+          publish_dir: ./htmlcov
+          publish_branch: gh-pages
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
