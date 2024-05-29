@@ -31,10 +31,11 @@ jobs:
           name: coverage-report
           path: htmlcov/
 
-      - name: Move coverage report
+      - name: Fix permissions and move coverage report
         run: |
+          sudo chmod -R 777 htmlcov
           mkdir -p coverage-report
-          mv htmlcov/* coverage-report/
+          cp -r htmlcov/* coverage-report/
 
       - name: Deploy to GitHub Pages
         if: success()
