@@ -153,7 +153,7 @@ class PlanoDatabaseRepository(BaseDatabaseRepository[Plano]):
             self.db.query(PlanoOperation)
             .filter(
                 PlanoOperation.id_plano == id_plano,
-                PlanoOperation.deleted_on.isnot(None),
+                PlanoOperation.deleted_on.is_(None),
                 PlanoOperation.operation_type == OperationType.RESGATE,
             )
             .order_by(PlanoOperation.created_on.desc())
