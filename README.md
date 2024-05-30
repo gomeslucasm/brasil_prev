@@ -103,6 +103,30 @@ docker-compose run --rm web poetry run pytest --cov=api --cov-report=term-missin
 
 O relatório será gerado em em htmlcov/index.html, abra o arquivo no seu navegador.
 
+# Evidências de funcionamento das apis
+
+Esta seção apresenta as evidências do funcionamento das apis desenvolvidas para o projeto.
+
+## Cadastro de Produto
+
+![evidence-user-creation](./images/evidence-user-creation.png)
+
+## Cadastro de Cliente
+
+![evidence-product-register](./images/evidence-product-register.png)
+
+## Contrato de Plano
+
+![evidence-contratacao-de-plano](./images/evidence-contratacao-de-plano.png)
+
+## Aporte Extra
+
+![evidence-aporte](./images/evidence-aporte.png)
+
+## Resgate
+
+![evidence-resgate](./images/evidence-resgate.png)
+
 # Evidências de Testes
 
 Esta seção apresenta as evidências dos testes realizados no projeto. As evidências incluem a saída dos testes e capturas de tela, proporcionando uma visão clara da cobertura e dos resultados dos testes.
