@@ -8,8 +8,8 @@ from api.plano.apis import plano_router
 
 
 app = FastAPI(
-    title="Brasilprev",
-    summary="Desafio Técnico Brasilprev – Backend.",
+    title="",
+    summary="",
 )
 
 
