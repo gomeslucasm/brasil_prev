@@ -1,6 +1,5 @@
-# Desafio Técnico Brasilprev – Backend
+# Crud de um sistema de previdência
 
-Este repositório contém a solução para o Desafio Técnico Brasilprev – Backend. O desafio consiste em construir uma API REST que permita a execução das seguintes ações:
 
     Cadastro de cliente
     Cadastro de produto
